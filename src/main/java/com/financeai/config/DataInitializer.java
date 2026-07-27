@@ -20,7 +20,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createDefaultCategories() {
-        // Vivienda - Housing
+        
         Category housing = new Category();
         housing.setName("Vivienda");
         housing.setColor("#1F77B4");
@@ -28,7 +28,7 @@ public class DataInitializer implements CommandLineRunner {
         housing.setIcon("🏠");
         categoryRepository.save(housing);
 
-        // Alimentación - Food
+        
         Category food = new Category();
         food.setName("Alimentación");
         food.setColor("#2CA02C");
@@ -36,7 +36,7 @@ public class DataInitializer implements CommandLineRunner {
         food.setIcon("🍔");
         categoryRepository.save(food);
 
-        // Transporte - Transport
+        
         Category transport = new Category();
         transport.setName("Transporte");
         transport.setColor("#FF7F0E");
@@ -44,7 +44,7 @@ public class DataInitializer implements CommandLineRunner {
         transport.setIcon("🚗");
         categoryRepository.save(transport);
 
-        // Servicios - Services
+        
         Category services = new Category();
         services.setName("Servicios");
         services.setColor("#D62728");
@@ -52,7 +52,7 @@ public class DataInitializer implements CommandLineRunner {
         services.setIcon("⚙️");
         categoryRepository.save(services);
 
-        // Salud - Health
+        
         Category health = new Category();
         health.setName("Salud");
         health.setColor("#9467BD");
@@ -60,7 +60,7 @@ public class DataInitializer implements CommandLineRunner {
         health.setIcon("⚕️");
         categoryRepository.save(health);
 
-        // Entretenimiento - Entertainment
+        
         Category entertainment = new Category();
         entertainment.setName("Entretenimiento");
         entertainment.setColor("#8C564B");
@@ -68,7 +68,7 @@ public class DataInitializer implements CommandLineRunner {
         entertainment.setIcon("🎬");
         categoryRepository.save(entertainment);
 
-        // Otros - Other
+        
         Category other = new Category();
         other.setName("Otros");
         other.setColor("#E377C2");
