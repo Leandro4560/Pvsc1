@@ -41,7 +41,13 @@ mvn spring-boot:run
 
 La API estará disponible en: `http://localhost:8080/api`
 
-### 4. Acceder a la consola H2 (opcional)
+### 4. Acceder a Swagger UI
+
+```
+http://localhost:8080/api/swagger-ui.html
+```
+
+### 5. Acceder a la consola H2 (opcional)
 
 ```
 http://localhost:8080/api/h2-console
