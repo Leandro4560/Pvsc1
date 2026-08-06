@@ -1,13 +1,13 @@
 package com.financeai.service;
 
-import com.financeai.entity.User;
+import com.financeai.entity.Usuario;
 import java.util.Optional;
 
 public interface UserService {
-    User createUser(String email, String password, String firstName, String lastName);
-    Optional<User> getUserById(Long id);
-    Optional<User> getUserByEmail(String email);
-    User updateUser(Long id, User user);
+    Usuario createUser(String email, String password, String firstName, String lastName);
+    Optional<Usuario> getUserById(Long id);
+    Optional<Usuario> getUserByEmail(String email);
+    Usuario updateUser(Long id, Usuario user);
     void deleteUser(Long id);
-    User updateFinancialData(Long userId, Double income, Double expenses, Double emergencyFund, Double debt);
+    Usuario updateFinancialData(Long userId, Double income, Double expenses, Double emergencyFund, Double debt);
 }

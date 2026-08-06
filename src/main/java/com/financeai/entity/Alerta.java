@@ -4,15 +4,15 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "alerts")
-public class Alert {
+@Table(name = "alertas")
+public class Alerta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Usuario user;
 
     @Column(nullable = false)
     private String title;
@@ -37,8 +37,6 @@ public class Alert {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getMessage() { return message; }
@@ -49,6 +47,8 @@ public class Alert {
     public void setIsRead(Boolean isRead) { this.isRead = isRead; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public Usuario getUser() { return user; }
+    public void setUser(Usuario user) { this.user = user; }
 
     public enum AlertType {
         LOW_EMERGENCY_FUND,

@@ -1,8 +1,8 @@
 package com.financeai.service.impl;
 
 import com.financeai.dto.AlertDTO;
-import com.financeai.entity.Alert;
-import com.financeai.entity.User;
+import com.financeai.entity.Alerta;
+import com.financeai.entity.Usuario;
 import com.financeai.repository.AlertRepository;
 import com.financeai.repository.UserRepository;
 import com.financeai.service.AlertService;
@@ -27,7 +27,7 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public List<AlertDTO> getUserAlerts(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<Usuario> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }
@@ -39,7 +39,7 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public List<AlertDTO> getUnreadAlerts(Long userId) {
-        Optional<User> user = userRepository.findById(userId);
+        Optional<Usuario> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }
@@ -51,22 +51,22 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public AlertDTO markAsRead(Long alertId) {
-        Optional<Alert> alert = alertRepository.findById(alertId);
+        Optional<Alerta> alert = alertRepository.findById(alertId);
         if (alert.isEmpty()) {
             throw new RuntimeException("Alert not found");
         }
-        Alert a = alert.get();
+        Alerta a = alert.get();
         a.setIsRead(true);
         return convertToDTO(alertRepository.save(a));
     }
 
     @Override
-    public void createAlert(Long userId, String title, String message, Alert.AlertType type) {
-        Optional<User> user = userRepository.findById(userId);
+    public void createAlert(Long userId, String title, String message, Alerta.AlertType type) {
+        Optional<Usuario> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new RuntimeException("User not found");
         }
-        Alert alert = new Alert();
+        Alerta alert = new Alerta();
         alert.setUser(user.get());
         alert.setTitle(title);
         alert.setMessage(message);
@@ -76,7 +76,7 @@ public class AlertServiceImpl implements AlertService {
         alertRepository.save(alert);
     }
 
-    private AlertDTO convertToDTO(Alert alert) {
+    private AlertDTO convertToDTO(Alerta alert) {
         AlertDTO dto = new AlertDTO();
         dto.setId(alert.getId());
         dto.setTitle(alert.getTitle());

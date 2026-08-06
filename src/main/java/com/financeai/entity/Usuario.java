@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "usuarios")
+public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,10 +42,10 @@ public class User {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Transaction> transactions;
+    private List<Transaccion> transactions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Alert> alerts;
+    private List<Alerta> alerts;
 
     @PrePersist
     protected void onCreate() {
@@ -80,8 +80,8 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-    public List<Transaction> getTransactions() { return transactions; }
-    public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
-    public List<Alert> getAlerts() { return alerts; }
-    public void setAlerts(List<Alert> alerts) { this.alerts = alerts; }
+    public List<Transaccion> getTransactions() { return transactions; }
+    public void setTransactions(List<Transaccion> transactions) { this.transactions = transactions; }
+    public List<Alerta> getAlerts() { return alerts; }
+    public void setAlerts(List<Alerta> alerts) { this.alerts = alerts; }
 }

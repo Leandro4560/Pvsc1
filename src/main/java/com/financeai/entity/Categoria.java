@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "categorias")
+public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,13 +17,13 @@ public class Category {
     private String color;
 
     @Column(nullable = false)
-    private Integer percentage; // Budget percentage
+    private Integer percentage; 
 
     @Column(nullable = false)
     private String icon;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Transaction> transactions;
+    private List<Transaccion> transactions;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -35,8 +35,8 @@ public class Category {
     public void setPercentage(Integer percentage) { this.percentage = percentage; }
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
-    public List<Transaction> getTransactions() { return transactions; }
-    public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
+    public List<Transaccion> getTransactions() { return transactions; }
+    public void setTransactions(List<Transaccion> transactions) { this.transactions = transactions; }
 
     public enum CategoryName {
         VIVIENDA("Vivienda", "#1F77B4"),

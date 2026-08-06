@@ -2,11 +2,11 @@ package com.financeai.service;
 
 import com.financeai.dto.DashboardDTO;
 import com.financeai.dto.DashboardMetricsDTO;
-import com.financeai.entity.User;
+import com.financeai.entity.Usuario;
 
 public interface DashboardService {
     DashboardDTO getDashboard(Long userId);
-    DashboardMetricsDTO calculateMetrics(User user);
-    void checkAlerts(User user);
-    void generateRecommendations(User user);
+    DashboardMetricsDTO calculateMetrics(Usuario user);
+    void checkAlerts(Usuario user);
+    void generateRecommendations(Usuario user);
 }

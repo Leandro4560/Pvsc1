@@ -28,7 +28,7 @@ public class DashboardController {
     public ResponseEntity<DashboardMetricsDTO> getMetrics(@PathVariable Long userId) {
         try {
             DashboardMetricsDTO metrics = dashboardService.calculateMetrics(
-                new com.financeai.entity.User()
+                new com.financeai.entity.Usuario()
             );
             return ResponseEntity.ok(metrics);
         } catch (Exception e) {

@@ -1,6 +1,6 @@
 package com.financeai.config;
 
-import com.financeai.entity.Category;
+import com.financeai.entity.Categoria;
 import com.financeai.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -20,56 +20,49 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createDefaultCategories() {
-        
-        Category housing = new Category();
+        Categoria housing = new Categoria();
         housing.setName("Vivienda");
         housing.setColor("#1F77B4");
         housing.setPercentage(30);
         housing.setIcon("🏠");
         categoryRepository.save(housing);
 
-        
-        Category food = new Category();
+        Categoria food = new Categoria();
         food.setName("Alimentación");
         food.setColor("#2CA02C");
         food.setPercentage(25);
         food.setIcon("🍔");
         categoryRepository.save(food);
 
-        
-        Category transport = new Category();
+        Categoria transport = new Categoria();
         transport.setName("Transporte");
         transport.setColor("#FF7F0E");
         transport.setPercentage(15);
         transport.setIcon("🚗");
         categoryRepository.save(transport);
 
-        
-        Category services = new Category();
+        Categoria services = new Categoria();
         services.setName("Servicios");
         services.setColor("#D62728");
         services.setPercentage(10);
         services.setIcon("⚙️");
         categoryRepository.save(services);
 
-        
-        Category health = new Category();
+        Categoria health = new Categoria();
         health.setName("Salud");
         health.setColor("#9467BD");
         health.setPercentage(8);
         health.setIcon("⚕️");
         categoryRepository.save(health);
 
-        
-        Category entertainment = new Category();
+        Categoria entertainment = new Categoria();
         entertainment.setName("Entretenimiento");
         entertainment.setColor("#8C564B");
         entertainment.setPercentage(10);
         entertainment.setIcon("🎬");
         categoryRepository.save(entertainment);
 
-        
-        Category other = new Category();
+        Categoria other = new Categoria();
         other.setName("Otros");
         other.setColor("#E377C2");
         other.setPercentage(2);

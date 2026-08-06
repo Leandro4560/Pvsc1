@@ -1,262 +1,182 @@
 # Finance AI Dashboard Backend API
 
-Backend RESTful API para un dashboard de análisis de salud financiera, desarrollado con Java y Spring Boot.
+Backend RESTful API para un dashboard de análisis de salud financiera, desarrollado con Java 17 y Spring Boot 3.2.0.
 
-## Características
+## ¿Qué incluye este proyecto?
 
-✅ **Gestión de Usuarios** - Crear, actualizar y eliminar usuarios  
-✅ **Gestión de Transacciones** - Registrar ingresos y gastos  
-✅ **Dashboard Completo** - Métricas, gráficos y análisis financiero  
-✅ **Sistema de Alertas** - Alertas automáticas sobre salud financiera  
-✅ **Recomendaciones** - Consejos personalizados según el análisis  
-✅ **Análisis por Categorías** - Desglose de gastos por categoría  
-✅ **Evolución Mensual** - Histórico de ingresos vs gastos  
-✅ **Cálculo de Puntuación** - Score de salud financiera (0-100)
+✅ Gestión de usuarios
+✅ Registro y consulta de transacciones
+✅ Dashboard con métricas financieras
+✅ Alertas automáticas
+✅ Recomendaciones personalizadas
+✅ Categorías predeterminadas para gastos
+✅ Base de datos H2 en memoria para desarrollo
 
-## Requisitos Previos
+## Requisitos previos
 
-- Java 17 o superior
+- Java 17
 - Maven 3.6+
 - Git
 
-## Instalación y Configuración
+> Importante: para que el proyecto funcione correctamente, la variable `JAVA_HOME` debe apuntar a un JDK 17.
 
-### 1. Clonar o descargar el proyecto
+## Estructura del proyecto
 
-```bash
-cd c:\Users\DETPC\PVSC
+```text
+src/main/java/com/financeai/
+├── config/              # Configuraciones y inicialización de datos
+├── controller/          # Controladores REST
+├── dto/                 # Objetos de transferencia de datos
+├── entity/              # Entidades JPA
+├── repository/          # Repositorios Spring Data JPA
+├── service/             # Interfaces de servicios
+├── service/impl/        # Implementaciones de servicios
+└── FinanceAiApplication.java
 ```
 
-### 2. Compilar el proyecto
+## Configuración local
+
+### 1. Entrar al proyecto
+
+```bash
+cd C:\Users\DETPC\PVSC
+```
+
+### 2. Verificar Java y Maven
+
+```bash
+java -version
+mvn -v
+```
+
+Debe mostrar Java 17 en ambos casos.
+
+### 3. Compilar el proyecto
 
 ```bash
 mvn clean install
 ```
 
-### 3. Ejecutar la aplicación
+### 4. Ejecutar la aplicación
 
 ```bash
 mvn spring-boot:run
 ```
 
-La API estará disponible en: `http://localhost:8080/api`
+La API quedará disponible en:
 
-### 4. Acceder a Swagger UI
-
-```
-http://localhost:8080/api/swagger-ui.html
+```text
+http://localhost:8080
 ```
 
-### 5. Acceder a la consola H2 (opcional)
+## Endpoints principales
 
-```
-http://localhost:8080/api/h2-console
-```
+### Usuarios
 
-## Estructura del Proyecto
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | /users | Crear un usuario |
+| GET | /users/{userId} | Obtener un usuario por ID |
+| GET | /users/email/{email} | Buscar usuario por correo |
+| PUT | /users/{userId} | Actualizar datos básicos |
+| PUT | /users/{userId}/financial | Actualizar datos financieros |
+| DELETE | /users/{userId} | Eliminar usuario |
 
-```
-src/main/java/com/financeai/
-├── config/              # Configuraciones (Security, DataInitializer)
-├── controller/          # Controllers REST
-├── dto/                 # Data Transfer Objects
-├── entity/              # Entidades JPA
-├── repository/          # Interfaces Repository
-├── service/             # Interfaces de Servicios
-├── service/impl/        # Implementaciones de Servicios
-└── FinanceAiApplication.java
-```
+### Transacciones
 
-## Endpoints de la API
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | /transactions | Crear una transacción |
+| GET | /transactions/user/{userId} | Obtener transacciones de un usuario |
+| GET | /transactions/{transactionId} | Obtener una transacción por ID |
+| DELETE | /transactions/{transactionId} | Eliminar una transacción |
 
-### 📊 Dashboard
-```
-GET  /api/dashboard/{userId}              - Obtener dashboard completo
-GET  /api/dashboard/{userId}/metrics      - Obtener métricas financieras
-```
+### Categorías
 
-### 👤 Usuarios
-```
-POST   /api/users                         - Crear nuevo usuario
-GET    /api/users/{userId}                - Obtener usuario
-GET    /api/users/email/{email}           - Buscar por email
-PUT    /api/users/{userId}                - Actualizar usuario
-PUT    /api/users/{userId}/financial      - Actualizar datos financieros
-DELETE /api/users/{userId}                - Eliminar usuario
-```
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | /categories | Listar categorías |
+| GET | /categories/{name} | Buscar categoría por nombre |
+| POST | /categories | Crear categoría |
 
-### 💰 Transacciones
-```
-POST   /api/transactions                  - Crear transacción
-GET    /api/transactions/user/{userId}    - Obtener todas las transacciones
-GET    /api/transactions/user/{userId}/recent?limit=5 - Últimas transacciones
-GET    /api/transactions/{transactionId}  - Obtener transacción
-DELETE /api/transactions/{transactionId}  - Eliminar transacción
-```
+### Alertas
 
-### 🏷️ Categorías
-```
-GET    /api/categories                    - Listar todas las categorías
-GET    /api/categories/{name}             - Obtener categoría por nombre
-POST   /api/categories                    - Crear categoría
-```
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | /alerts/user/{userId} | Obtener alertas de un usuario |
+| GET | /alerts/user/{userId}/unread | Obtener alertas no leídas |
+| PUT | /alerts/{alertId}/read | Marcar alerta como leída |
 
-### 🔔 Alertas
-```
-GET    /api/alerts/user/{userId}          - Obtener alertas del usuario
-GET    /api/alerts/user/{userId}/unread   - Obtener alertas no leídas
-PUT    /api/alerts/{alertId}/read         - Marcar alerta como leída
-```
+## Ejemplos de uso
 
-## Ejemplos de Uso
-
-### Crear Usuario
+### Crear un usuario
 
 ```bash
-POST http://localhost:8080/api/users
-Content-Type: application/json
-
-{
-  "email": "usuario@ejemplo.com",
-  "password": "password123",
-  "firstName": "Juan",
-  "lastName": "Pérez",
-  "monthlyIncome": 900000,
-  "monthlyExpenses": 760000,
-  "emergencyFund": 36000,
-  "monthlyDebt": 180000
-}
+curl -X POST http://localhost:8080/users \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"juan@example.com\",\"password\":\"123456\",\"firstName\":\"Juan\",\"lastName\":\"Pérez\"}"
 ```
 
-### Crear Transacción
+### Crear una transacción
 
 ```bash
-POST http://localhost:8080/api/transactions?userId=1
-Content-Type: application/json
-
-{
-  "description": "Supermercado La Anónima",
-  "amount": 45230,
-  "category": "Alimentación",
-  "transactionDate": "2024-05-20T14:30:00",
-  "type": "EXPENSE"
-}
+curl -X POST http://localhost:8080/transactions?userId=1 \
+  -H "Content-Type: application/json" \
+  -d "{\"description\":\"Supermercado\",\"amount\":45000,\"category\":\"Alimentación\",\"transactionDate\":\"2024-05-20T14:30:00\",\"type\":\"EXPENSE\"}"
 ```
 
-### Obtener Dashboard
+### Obtener el dashboard de un usuario
 
 ```bash
-GET http://localhost:8080/api/dashboard/1
+curl http://localhost:8080/dashboard/1
 ```
 
-### Actualizar Datos Financieros
+## Base de datos
 
-```bash
-PUT http://localhost:8080/api/users/1/financial?income=950000&expenses=780000&emergencyFund=40000&debt=185000
+Por defecto el proyecto usa H2 en memoria.
+
+La consola H2 queda disponible en:
+
+```text
+http://localhost:8080/h2-console
 ```
 
-## Modelos de Datos
+## Seguridad
 
-### User
-- `id`: Long (Primary Key)
-- `email`: String (Unique)
-- `password`: String (Encoded)
-- `firstName`: String
-- `lastName`: String
-- `monthlyIncome`: Double
-- `monthlyExpenses`: Double
-- `emergencyFund`: Double
-- `monthlyDebt`: Double
-- `createdAt`: LocalDateTime
-- `updatedAt`: LocalDateTime
+La aplicación usa Spring Security. Al arrancar, Spring puede mostrar una contraseña temporal de desarrollo en la consola. Se recomienda usar una configuración más robusta en producción.
 
-### Transaction
-- `id`: Long (Primary Key)
-- `user`: User (Foreign Key)
-- `description`: String
-- `amount`: Double
-- `category`: Category (Foreign Key)
-- `type`: INCOME/EXPENSE
-- `confidence`: Integer (0-100)
-- `transactionDate`: LocalDateTime
-- `createdAt`: LocalDateTime
-- `updatedAt`: LocalDateTime
+## Variables de entorno importantes
 
-### Category
-- `id`: Long (Primary Key)
-- `name`: String (Unique)
-- `color`: String (Hex color)
-- `percentage`: Integer (Budget %)
-- `icon`: String (Emoji or icon)
+- `JAVA_HOME`: debe apuntar al JDK 17.
+- `PATH`: debe incluir `%JAVA_HOME%\bin`.
 
-### Alert
-- `id`: Long (Primary Key)
-- `user`: User (Foreign Key)
-- `title`: String
-- `message`: String
-- `type`: AlertType (LOW_EMERGENCY_FUND, HIGH_EXPENSES, etc.)
-- `isRead`: Boolean
-- `createdAt`: LocalDateTime
+## Troubleshooting
 
-## Métricas del Dashboard
+### Error al ejecutar Maven
 
-El score de salud financiera se calcula basado en:
+Si aparece un error como `Process terminated with exit code: 1`, revisa:
 
-- **Deuda**: Si > 50% ingresos: -30 puntos | Si > 30%: -15 puntos
-- **Fondo de Emergencia**: Si < 1 mes: -20 puntos | Si < 3 meses: -10 puntos  
-- **Relación Gastos/Ingresos**: Si > 85%: -10 puntos | Si > 70%: -5 puntos
+1. Que `JAVA_HOME` apunte a Java 17.
+2. Que `mvn -v` muestre Java 17.
+3. Que no haya un puerto 8080 ocupado.
 
-### Categorías de Gastos Predefinidas
+### Puerto ocupado
 
-- 🏠 Vivienda (30%)
-- 🍔 Alimentación (25%)
-- 🚗 Transporte (15%)
-- ⚙️ Servicios (10%)
-- ⚕️ Salud (8%)
-- 🎬 Entretenimiento (10%)
-- 📦 Otros (2%)
-
-## Alertas Automáticas
-
-El sistema genera automáticamente:
-
-1. **Fondo de emergencia bajo** - Si cubre < 1 mes de gastos
-2. **Nivel de deuda alto** - Si > 50% de ingresos
-3. **Gastos muy altos** - Si > 85% de ingresos
-
-## Recomendaciones
-
-El sistema proporciona recomendaciones automáticas:
-
-1. Reducir gastos variables (entretenimiento, servicios)
-2. Aumentar fondo de emergencia (3-6 meses de gastos)
-3. Monitorear y reducir deuda
-
-## Base de Datos
-
-Por defecto, el proyecto usa **H2** (base de datos en memoria).
-
-Para usar **PostgreSQL**, modifica `application.properties`:
+Si 8080 ya está en uso, puedes cambiarlo en `application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/financedb
-spring.datasource.driverClassName=org.postgresql.Driver
-spring.datasource.username=postgres
-spring.datasource.password=your_password
-spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+server.port=8081
 ```
 
-Y agrega la dependencia en `pom.xml`:
+## Tecnologías usadas
 
-```xml
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <scope>runtime</scope>
-</dependency>
-```
-
-## CORS
+- Java 17
+- Spring Boot 3.2.0
+- Spring Data JPA
+- Spring Security
+- H2 Database
+- Lombok
+- Maven
 
 El backend está configurado para aceptar solicitudes desde:
 - `http://localhost:3000`
