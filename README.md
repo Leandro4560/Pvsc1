@@ -4,13 +4,13 @@ Backend RESTful API para un dashboard de análisis de salud financiera, desarrol
 
 ## ¿Qué incluye este proyecto?
 
-✅ Gestión de usuarios
-✅ Registro y consulta de transacciones
-✅ Dashboard con métricas financieras
-✅ Alertas automáticas
-✅ Recomendaciones personalizadas
-✅ Categorías predeterminadas para gastos
-✅ Base de datos H2 en memoria para desarrollo
+Gestión de usuarios
+Registro y consulta de transacciones
+Dashboard con métricas financieras
+Alertas automáticas
+Recomendaciones personalizadas
+Categorías predeterminadas para gastos
+Base de datos H2 en memoria para desarrollo
 
 ## Requisitos previos
 
