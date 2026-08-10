@@ -74,20 +74,48 @@ public class DashboardServiceImpl implements DashboardService {
     public DashboardMetricsDTO calculateMetrics(Usuario user) {
         DashboardMetricsDTO metrics = new DashboardMetricsDTO();
 
-        metrics.setMonthlyIncome(user.getMonthlyIncome());
-        metrics.setMonthlyExpenses(user.getMonthlyExpenses());
+        // Calcular ingresos y gastos del mes actual desde las transacciones
+        List<Transaccion> transactions = transactionRepository.findByUser(user);
+        YearMonth currentMonth = YearMonth.now();
 
-        Double estimatedBalance = user.getMonthlyIncome() - user.getMonthlyExpenses();
+        Double monthlyIncome = 0.0;
+        Double monthlyExpenses = 0.0;
+
+        for (Transaccion t : transactions) {
+            YearMonth transactionMonth = YearMonth.from(t.getTransactionDate());
+            if (transactionMonth.equals(currentMonth)) {
+                if (t.getType() == Transaccion.TransactionType.INCOME) {
+                    monthlyIncome += t.getAmount();
+                } else if (t.getType() == Transaccion.TransactionType.EXPENSE) {
+                    monthlyExpenses += t.getAmount();
+                }
+            }
+        }
+
+        // Si no hay transacciones en el mes actual, usar los valores del usuario como respaldo
+        if (monthlyIncome == 0.0 && user.getMonthlyIncome() > 0) {
+            monthlyIncome = user.getMonthlyIncome();
+        }
+        if (monthlyExpenses == 0.0 && user.getMonthlyExpenses() > 0) {
+            monthlyExpenses = user.getMonthlyExpenses();
+        }
+
+        metrics.setMonthlyIncome(monthlyIncome);
+        metrics.setMonthlyExpenses(monthlyExpenses);
+
+        Double estimatedBalance = monthlyIncome - monthlyExpenses;
         metrics.setEstimatedBalance(estimatedBalance);
 
-        Integer debtPercentage = calculateDebtPercentage(user);
+        Integer debtPercentage = monthlyIncome > 0
+            ? (int) ((user.getMonthlyDebt() / monthlyIncome) * 100)
+            : 0;
         metrics.setDebtPercentage(debtPercentage);
 
-        Double monthlySavings = user.getMonthlyIncome() - user.getMonthlyExpenses();
+        Double monthlySavings = monthlyIncome - monthlyExpenses;
         metrics.setMonthlySavings(Math.max(monthlySavings, 0));
 
-        Double emergencyFundMonths = user.getMonthlyExpenses() > 0 
-            ? user.getEmergencyFund() / user.getMonthlyExpenses() 
+        Double emergencyFundMonths = monthlyExpenses > 0 
+            ? user.getEmergencyFund() / monthlyExpenses 
             : 0;
         metrics.setEmergencyFundMonths(emergencyFundMonths);
 
@@ -99,9 +127,35 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public void checkAlerts(Usuario user) {
+        // Calcular gastos e ingresos reales del mes desde transacciones
+        List<Transaccion> transactions = transactionRepository.findByUser(user);
+        YearMonth currentMonth = YearMonth.now();
+
+        Double monthlyIncome = 0.0;
+        Double monthlyExpenses = 0.0;
+
+        for (Transaccion t : transactions) {
+            YearMonth transactionMonth = YearMonth.from(t.getTransactionDate());
+            if (transactionMonth.equals(currentMonth)) {
+                if (t.getType() == Transaccion.TransactionType.INCOME) {
+                    monthlyIncome += t.getAmount();
+                } else if (t.getType() == Transaccion.TransactionType.EXPENSE) {
+                    monthlyExpenses += t.getAmount();
+                }
+            }
+        }
+
+        // Usar valores del usuario como respaldo
+        if (monthlyIncome == 0.0 && user.getMonthlyIncome() > 0) {
+            monthlyIncome = user.getMonthlyIncome();
+        }
+        if (monthlyExpenses == 0.0 && user.getMonthlyExpenses() > 0) {
+            monthlyExpenses = user.getMonthlyExpenses();
+        }
+
         // Check for low emergency fund
-        if (user.getMonthlyExpenses() > 0) {
-            Double emergencyFundMonths = user.getEmergencyFund() / user.getMonthlyExpenses();
+        if (monthlyExpenses > 0) {
+            Double emergencyFundMonths = user.getEmergencyFund() / monthlyExpenses;
             if (emergencyFundMonths < 1.0 && !hasAlert(user, Alerta.AlertType.LOW_EMERGENCY_FUND)) {
                 alertService.createAlert(
                     user.getId(),
@@ -113,7 +167,9 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // Check for high debt
-        Integer debtPercentage = calculateDebtPercentage(user);
+        Integer debtPercentage = monthlyIncome > 0
+            ? (int) ((user.getMonthlyDebt() / monthlyIncome) * 100)
+            : 0;
         if (debtPercentage > 50 && !hasAlert(user, Alerta.AlertType.HIGH_DEBT)) {
             alertService.createAlert(
                 user.getId(),
@@ -124,14 +180,16 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // Check for high expenses
-        Double expenseRatio = (user.getMonthlyExpenses() / user.getMonthlyIncome()) * 100;
-        if (expenseRatio > 85 && !hasAlert(user, Alerta.AlertType.HIGH_EXPENSES)) {
-            alertService.createAlert(
-                user.getId(),
-                "Gastos muy altos",
-                "Tus gastos representan más del 85% de tus ingresos",
-                Alerta.AlertType.HIGH_EXPENSES
-            );
+        if (monthlyIncome > 0) {
+            Double expenseRatio = (monthlyExpenses / monthlyIncome) * 100;
+            if (expenseRatio > 85 && !hasAlert(user, Alerta.AlertType.HIGH_EXPENSES)) {
+                alertService.createAlert(
+                    user.getId(),
+                    "Gastos muy altos",
+                    "Tus gastos representan más del 85% de tus ingresos",
+                    Alerta.AlertType.HIGH_EXPENSES
+                );
+            }
         }
     }
 
@@ -242,10 +300,28 @@ public class DashboardServiceImpl implements DashboardService {
         if (emergencyFundMonths < 1) score -= 20;
         else if (emergencyFundMonths < 3) score -= 10;
 
-        // Deduct points for high expense ratio
-        Double expenseRatio = (user.getMonthlyExpenses() / user.getMonthlyIncome()) * 100;
-        if (expenseRatio > 85) score -= 10;
-        else if (expenseRatio > 70) score -= 5;
+        // Deduct points for high expense ratio (usando transacciones del mes)
+        List<Transaccion> transactions = transactionRepository.findByUser(user);
+        YearMonth currentMonth = YearMonth.now();
+        Double monthlyIncome = 0.0;
+        Double monthlyExpenses = 0.0;
+
+        for (Transaccion t : transactions) {
+            YearMonth transactionMonth = YearMonth.from(t.getTransactionDate());
+            if (transactionMonth.equals(currentMonth)) {
+                if (t.getType() == Transaccion.TransactionType.INCOME) {
+                    monthlyIncome += t.getAmount();
+                } else if (t.getType() == Transaccion.TransactionType.EXPENSE) {
+                    monthlyExpenses += t.getAmount();
+                }
+            }
+        }
+
+        if (monthlyIncome > 0) {
+            Double expenseRatio = (monthlyExpenses / monthlyIncome) * 100;
+            if (expenseRatio > 85) score -= 10;
+            else if (expenseRatio > 70) score -= 5;
+        }
 
         return Math.max(score, 0);
     }

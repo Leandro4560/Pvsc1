@@ -39,8 +39,20 @@ public class TransactionServiceImpl implements TransactionService {
         }
 
         Optional<Categoria> category = categoryRepository.findByName(dto.getCategory());
+        
+        // Si la categoría no existe y es un ingreso, crearla automáticamente
         if (category.isEmpty()) {
-            throw new RuntimeException("Category not found");
+            if ("INCOME".equalsIgnoreCase(dto.getType())) {
+                Categoria nuevaCategoria = new Categoria();
+                nuevaCategoria.setName(dto.getCategory());
+                nuevaCategoria.setColor("#4CAF50");
+                nuevaCategoria.setPercentage(0);
+                nuevaCategoria.setIcon("dollar-sign");
+                nuevaCategoria = categoryRepository.save(nuevaCategoria);
+                category = Optional.of(nuevaCategoria);
+            } else {
+                throw new RuntimeException("Category not found");
+            }
         }
 
         Transaccion transaction = new Transaccion();

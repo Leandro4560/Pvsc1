@@ -12,15 +12,28 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200", "http://localhost:5173"})
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<Usuario> createUser(@Valid @RequestBody Usuario user) {
+    public ResponseEntity<?> createUser(@RequestBody Usuario user) {
         try {
+            if (user.getEmail() == null || user.getEmail().isEmpty()) {
+                return ResponseEntity.badRequest().body("El email es requerido");
+            }
+            if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                return ResponseEntity.badRequest().body("La contraseña es requerida");
+            }
+            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre es requerido");
+            }
+            if (user.getLastName() == null || user.getLastName().isEmpty()) {
+                return ResponseEntity.badRequest().body("El apellido es requerido");
+            }
+            
             Usuario created = userService.createUser(
                 user.getEmail(),
                 user.getPassword(),
@@ -28,8 +41,11 @@ public class UserController {
                 user.getLastName()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear usuario: " + e.getMessage());
         }
     }
 

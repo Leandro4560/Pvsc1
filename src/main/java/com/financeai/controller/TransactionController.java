@@ -13,21 +13,40 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:4200", "http://localhost:5173"})
 public class TransactionController {
 
     @Autowired
     private TransactionService transactionService;
 
     @PostMapping
-    public ResponseEntity<TransactionDTO> createTransaction(
+    public ResponseEntity<?> createTransaction(
             @RequestParam Long userId,
-            @Valid @RequestBody CreateTransactionDTO dto) {
+            @RequestBody CreateTransactionDTO dto) {
         try {
+            if (dto.getDescription() == null || dto.getDescription().isEmpty()) {
+                return ResponseEntity.badRequest().body("La descripción es requerida");
+            }
+            if (dto.getAmount() == null) {
+                return ResponseEntity.badRequest().body("El monto es requerido");
+            }
+            if (dto.getCategory() == null || dto.getCategory().isEmpty()) {
+                return ResponseEntity.badRequest().body("La categoría es requerida");
+            }
+            if (dto.getTransactionDate() == null) {
+                return ResponseEntity.badRequest().body("La fecha es requerida");
+            }
+            if (dto.getType() == null || dto.getType().isEmpty()) {
+                return ResponseEntity.badRequest().body("El tipo es requerido (INCOME o EXPENSE)");
+            }
+            
             TransactionDTO transaction = transactionService.createTransaction(userId, dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(transaction);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 

@@ -44,7 +44,8 @@ public class Categoria {
         TRANSPORTE("Transporte", "#FF7F0E"),
         SERVICIOS("Servicios", "#D62728"),
         SALUD("Salud", "#9467BD"),
-        ENTRETENIMIENTO("Entretenimiento", "#8C564B");
+        ENTRETENIMIENTO("Entretenimiento", "#8C564B"),
+        INGRESOS("Ingresos", "#4CAF50");
 
         private final String displayName;
         private final String color;

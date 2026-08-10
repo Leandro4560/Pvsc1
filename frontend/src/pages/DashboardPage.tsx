@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import AlertsCard from "../features/dashboard/components/AlertsCard";
-import { dashboardMock } from "../features/dashboard/components/dashboardMocks";
+import { dashboardMock, type DashboardData } from "../features/dashboard/components/dashboardMocks";
 import DashboardLayout from "../features/dashboard/components/DashboardLayout";
 import ExpensesByCategoryCard from "../features/dashboard/components/ExpensesByCategoryCard";
 import KeyFactorsCard from "../features/dashboard/components/KeyFactorsCard";
@@ -8,37 +9,49 @@ import RecommendationsCard from "../features/dashboard/components/Recommendation
 import ScoreCard from "../features/dashboard/components/ScoreCard";
 import StatsGrid from "../features/dashboard/components/StatsGrid";
 import TransactionsTable from "../features/dashboard/components/TransactionsTable";
+import { fetchDashboardData } from "../api/dashboard";
 import "./DashboardPage.css";
 
 function DashboardPage() {
+  const [dashboardData, setDashboardData] = useState<DashboardData>(dashboardMock);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      const data = await fetchDashboardData("1");
+      setDashboardData(data);
+    }
+
+    loadDashboard();
+  }, []);
+
   return (
-    <DashboardLayout lastAnalysisDate={dashboardMock.lastAnalysisDate} hasNotifications>
+    <DashboardLayout lastAnalysisDate={dashboardData.lastAnalysisDate} hasNotifications>
       <div className="dashboard-page__grid">
         <div className="dashboard-page__main">
           <ScoreCard
-            status={dashboardMock.financialProfile}
-            score={dashboardMock.score ?? 0}
-            monthlyIncome={dashboardMock.indicators.monthlyIncome}
-            totalExpenses={dashboardMock.indicators.totalExpenses}
+            status={dashboardData.financialProfile}
+            score={dashboardData.score ?? 0}
+            monthlyIncome={dashboardData.indicators.monthlyIncome}
+            totalExpenses={dashboardData.indicators.totalExpenses}
           />
 
-          <StatsGrid indicators={dashboardMock.indicators} />
+          <StatsGrid indicators={dashboardData.indicators} />
 
           <div className="dashboard-page__charts-row">
             <ExpensesByCategoryCard
-              categories={dashboardMock.expensesByCategory}
-              total={dashboardMock.indicators.totalExpenses}
+              categories={dashboardData.expensesByCategory}
+              total={dashboardData.indicators.totalExpenses}
             />
-            <MonthlyEvolutionCard data={dashboardMock.monthlyEvolution} />
+            <MonthlyEvolutionCard data={dashboardData.monthlyEvolution} />
           </div>
 
-          <TransactionsTable transactions={dashboardMock.classifiedTransactions} />
+          <TransactionsTable transactions={dashboardData.classifiedTransactions} />
         </div>
 
         <div className="dashboard-page__side">
-          <KeyFactorsCard factors={dashboardMock.keyFactors} />
-          <RecommendationsCard recommendations={dashboardMock.recommendations} />
-          <AlertsCard alerts={dashboardMock.alerts} />
+          <KeyFactorsCard factors={dashboardData.keyFactors} />
+          <RecommendationsCard recommendations={dashboardData.recommendations} />
+          <AlertsCard alerts={dashboardData.alerts} />
         </div>
       </div>
     </DashboardLayout>
