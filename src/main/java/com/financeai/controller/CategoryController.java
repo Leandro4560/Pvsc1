@@ -28,10 +28,10 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<Categoria> getCategoryByName(@PathVariable String name) {
+    @GetMapping("/{nombre}")
+    public ResponseEntity<Categoria> getCategoryByName(@PathVariable String nombre) {
         try {
-            Optional<Categoria> category = categoryService.getCategoryByName(name);
+            Optional<Categoria> category = categoryService.getCategoryByName(nombre);
             return category.map(ResponseEntity::ok)
                     .orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
@@ -43,9 +43,8 @@ public class CategoryController {
     public ResponseEntity<Categoria> createCategory(@RequestBody Categoria category) {
         try {
             Categoria created = categoryService.createCategory(
-                category.getName(),
+                category.getNombre(),
                 category.getColor(),
-                category.getPercentage(),
                 category.getIcon()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(created);

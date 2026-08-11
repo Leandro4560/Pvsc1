@@ -3,33 +3,49 @@ import { dashboardMock, type DashboardData } from "../features/dashboard/compone
 import type { FinancialStatus } from "../types/financial-analysis";
 
 interface DashboardMetricsDTO {
-  monthlyIncome?: number;
-  monthlyExpenses?: number;
-  estimatedBalance?: number;
-  debtPercentage?: number;
-  monthlySavings?: number;
-  emergencyFundMonths?: number;
-  financialHealthScore?: number;
+  ingreso_mensual_fijo?: number;
+  ingreso_mensual_variable?: number;
+  ingreso_mensual?: number;
+  gastos_esenciales_mensuales?: number;
+  gastos_no_esenciales_mensuales?: number;
+  gastos_totales_del_mes?: number;
+  cuotas_mensuales_deuda?: number;
+  modalidad_pago_tarjeta?: string;
+  ahorro_mensual?: number;
+  ahorro_previo?: number;
+  ahorro_total?: number;
+  ratio_ahorro_neto?: number;
+  ratio_endeudamiento_dti?: number;
+  gastos_esenciales_ratio?: number;
+  gastos_estilo_vida_ratio?: number;
+  meses_supervivencia?: number;
+  frecuencia_transacciones_ocio?: number;
+  perfil_financiero?: string;
 }
 
 interface ExpenseByCategoryDTO {
-  categoryName?: string;
-  amount?: number;
-  percentage?: number;
+  categoria_principal?: string;
+  monto?: number;
+  porcentaje?: number;
 }
 
 interface MonthlyEvolutionDTO {
   month?: string;
-  income?: number;
-  expenses?: number;
+  ingresos?: number;
+  gastos?: number;
 }
 
 interface TransactionDTO {
   id?: number | string;
-  description?: string;
-  amount?: number;
-  category?: string;
+  nombre_tienda?: string;
+  subcategoria?: string;
+  monto?: number;
+  metodo_pago?: string;
+  esencial?: boolean;
+  categoria_principal?: string;
   confidence?: number;
+  fecha?: string;
+  type?: string;
 }
 
 interface AlertDTO {
@@ -55,20 +71,40 @@ interface DashboardDTO {
   recommendations?: RecommendationDTO[];
 }
 
-function mapFinancialProfile(score?: number): FinancialStatus {
-  if (score == null) {
+function mapPerfilToStatus(perfil?: string): FinancialStatus {
+  if (perfil == null) {
     return "OBSERVATION";
   }
 
-  if (score >= 80) {
+  const perfilLower = perfil.toLowerCase();
+  if (perfilLower.includes("saludable")) {
     return "HEALTHY";
   }
-
-  if (score >= 50) {
-    return "OBSERVATION";
+  if (perfilLower.includes("riesgo")) {
+    return "RISK";
   }
+  return "OBSERVATION";
+}
 
-  return "RISK";
+function mapPerfilToScore(metrics: DashboardMetricsDTO): number {
+  let score = 50;
+
+  const ratioAhorro = metrics.ratio_ahorro_neto ?? 0;
+  const ratioDti = metrics.ratio_endeudamiento_dti ?? 0;
+  const mesesSup = metrics.meses_supervivencia ?? 0;
+
+  if (ratioAhorro >= 0.20) score += 20;
+  else if (ratioAhorro >= 0.10) score += 10;
+  else if (ratioAhorro < 0) score -= 15;
+
+  if (ratioDti <= 0.20) score += 15;
+  else if (ratioDti > 0.37) score -= 20;
+
+  if (mesesSup >= 3) score += 15;
+  else if (mesesSup >= 1) score += 5;
+  else score -= 10;
+
+  return Math.max(0, Math.min(100, score));
 }
 
 function normalizeConfidence(confidence?: number): number | undefined {
@@ -96,22 +132,23 @@ function getAlertSeverity(alertType?: string) {
 
 function mapDashboard(dto: DashboardDTO): DashboardData {
   const metrics = dto.metrics ?? {};
-  const totalExpenses = metrics.monthlyExpenses ?? 0;
-  const monthlyIncome = metrics.monthlyIncome ?? 0;
-  const percentageOfIncome = monthlyIncome > 0 ? totalExpenses / monthlyIncome : 0;
-  const score = metrics.financialHealthScore ?? 0;
+  const ingreso_mensual = metrics.ingreso_mensual ?? 0;
+  const gastos_totales_del_mes = metrics.gastos_totales_del_mes ?? 0;
+  const gastos_esenciales_ratio = metrics.gastos_esenciales_ratio ?? 0;
+  const gastos_estilo_vida_ratio = metrics.gastos_estilo_vida_ratio ?? 0;
+  const score = mapPerfilToScore(metrics);
 
   const indicators = {
-    monthlyIncome,
-    totalExpenses,
-    estimatedBalance: metrics.estimatedBalance ?? 0,
-    monthlySavings: metrics.monthlySavings ?? 0,
-    debtRatio: (metrics.debtPercentage ?? 0) / 100,
-    emergencyFundMonths: metrics.emergencyFundMonths ?? 0,
+    monthlyIncome: ingreso_mensual,
+    totalExpenses: gastos_totales_del_mes,
+    estimatedBalance: metrics.ahorro_mensual ?? 0,
+    monthlySavings: Math.max(metrics.ahorro_mensual ?? 0, 0),
+    debtRatio: metrics.ratio_endeudamiento_dti ?? 0,
+    emergencyFundMonths: metrics.meses_supervivencia ?? 0,
   };
 
   return {
-    financialProfile: mapFinancialProfile(score),
+    financialProfile: mapPerfilToStatus(metrics.perfil_financiero),
     score,
     lastAnalysisDate: new Date().toLocaleDateString("es-AR", {
       day: "2-digit",
@@ -121,22 +158,22 @@ function mapDashboard(dto: DashboardDTO): DashboardData {
     indicators,
     expensesByCategory:
       dto.expensesByCategory?.map((item) => ({
-        category: item.categoryName ?? "Otros",
-        amount: item.amount ?? 0,
-        percentage: item.percentage != null ? (item.percentage > 1 ? item.percentage / 100 : item.percentage) : 0,
+        category: item.categoria_principal ?? "Otros",
+        amount: item.monto ?? 0,
+        percentage: item.porcentaje != null ? (item.porcentaje > 1 ? item.porcentaje / 100 : item.porcentaje) : 0,
       })) ?? [],
     monthlyEvolution:
       dto.monthlyEvolution?.map((item) => ({
         month: item.month ?? "",
-        income: item.income ?? 0,
-        expenses: item.expenses ?? 0,
+        income: item.ingresos ?? 0,
+        expenses: item.gastos ?? 0,
       })) ?? [],
     classifiedTransactions:
       dto.recentTransactions?.map((transaction) => ({
         id: String(transaction.id ?? ""),
-        description: transaction.description ?? "",
-        amount: transaction.amount ?? 0,
-        mainCategory: transaction.category ?? "Otros",
+        description: transaction.nombre_tienda ?? "",
+        amount: transaction.monto ?? 0,
+        mainCategory: transaction.categoria_principal ?? "Otros",
         confidence: normalizeConfidence(transaction.confidence),
       })) ?? [],
     recommendations:
@@ -152,11 +189,12 @@ function mapDashboard(dto: DashboardDTO): DashboardData {
         message: alert.title ? `${alert.title}: ${alert.message ?? ""}` : alert.message ?? "",
       })) ?? [],
     keyFactors: [
-      `Tus gastos representan el ${Math.round(percentageOfIncome * 100)}% de tus ingresos`,
-      `Tu deuda mensual es de ${metrics.debtPercentage ?? 0}%`,
-      `Tu fondo de emergencia cubre ${indicators.emergencyFundMonths.toLocaleString("es-AR", {
+      `Tus gastos esenciales representan el ${Math.round(gastos_esenciales_ratio * 100)}% de tus ingresos`,
+      `Tu ratio de endeudamiento (DTI) es de ${Math.round((metrics.ratio_endeudamiento_dti ?? 0) * 100)}%`,
+      `Tus meses de supervivencia: ${(metrics.meses_supervivencia ?? 0).toLocaleString("es-AR", {
         maximumFractionDigits: 1,
-      })} meses`,
+      })}`,
+      `Gastos estilo de vida: ${Math.round(gastos_estilo_vida_ratio * 100)}% de tus ingresos`,
     ],
   };
 }

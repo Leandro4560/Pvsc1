@@ -23,17 +23,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Optional<Categoria> getCategoryByName(String name) {
-        return categoryRepository.findByName(name);
+    public Optional<Categoria> getCategoryByName(String nombre) {
+        return categoryRepository.findByNombre(nombre);
     }
 
     @Override
-    public Categoria createCategory(String name, String color, Integer percentage, String icon) {
-        Categoria category = new Categoria();
-        category.setName(name);
-        category.setColor(color);
-        category.setPercentage(percentage);
-        category.setIcon(icon);
-        return categoryRepository.save(category);
+    public Categoria createCategory(String nombre, String color, String icon) {
+        Categoria categoria = new Categoria();
+        categoria.setNombre(nombre);
+        categoria.setColor(color);
+        categoria.setIcon(icon);
+        return categoryRepository.save(categoria);
     }
 }

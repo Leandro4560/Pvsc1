@@ -38,13 +38,13 @@ public class TransactionServiceImpl implements TransactionService {
             throw new RuntimeException("User not found");
         }
 
-        Optional<Categoria> category = categoryRepository.findByName(dto.getCategory());
-        
+        Optional<Categoria> category = categoryRepository.findByName(dto.getCategoriaPrincipal());
+
         // Si la categoría no existe y es un ingreso, crearla automáticamente
         if (category.isEmpty()) {
             if ("INCOME".equalsIgnoreCase(dto.getType())) {
                 Categoria nuevaCategoria = new Categoria();
-                nuevaCategoria.setName(dto.getCategory());
+                nuevaCategoria.setName(dto.getCategoriaPrincipal());
                 nuevaCategoria.setColor("#4CAF50");
                 nuevaCategoria.setPercentage(0);
                 nuevaCategoria.setIcon("dollar-sign");
@@ -57,12 +57,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         Transaccion transaction = new Transaccion();
         transaction.setUser(user.get());
-        transaction.setDescription(dto.getDescription());
-        transaction.setAmount(dto.getAmount());
+        transaction.setDescription(dto.getNombreTienda());
+        transaction.setAmount(dto.getMonto());
         transaction.setCategory(category.get());
-        transaction.setTransactionDate(dto.getTransactionDate());
+        transaction.setTransactionDate(dto.getFecha());
         transaction.setType(Transaccion.TransactionType.valueOf(dto.getType()));
-        transaction.setConfidence(95); // Default confidence
+        transaction.setConfidence(95);
         transaction.setCreatedAt(LocalDateTime.now());
 
         Transaccion saved = transactionRepository.save(transaction);
@@ -120,12 +120,15 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionDTO convertToDTO(Transaccion transaction) {
         TransactionDTO dto = new TransactionDTO();
         dto.setId(transaction.getId());
-        dto.setDescription(transaction.getDescription());
-        dto.setAmount(transaction.getAmount());
-        dto.setCategory(transaction.getCategory().getName());
+        dto.setNombreTienda(transaction.getDescription());
+        dto.setMonto(transaction.getAmount());
+        dto.setCategoriaPrincipal(transaction.getCategory().getName());
         dto.setConfidence(transaction.getConfidence());
-        dto.setTransactionDate(transaction.getTransactionDate());
+        dto.setFecha(transaction.getTransactionDate());
         dto.setType(transaction.getType().toString());
+        dto.setEsencial(null); // Se puede calcular basado en la categoría
+        dto.setMetodoPago(null); // Campo opcional
+        dto.setSubcategoria(null); // Campo opcional
         return dto;
     }
 }

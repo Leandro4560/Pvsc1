@@ -1,33 +1,53 @@
 package com.financeai.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class CreateTransactionDTO {
-    @NotBlank(message = "Description is required")
-    private String description;
+    @NotBlank(message = "El nombre de tienda es requerido")
+    @JsonProperty("nombre_tienda")
+    private String nombreTienda;
 
-    @NotNull(message = "Amount is required")
-    private Double amount;
+    @JsonProperty("subcategoria")
+    private String subcategoria;
 
-    @NotBlank(message = "Category is required")
-    private String category;
+    @NotNull(message = "El monto es requerido")
+    @JsonProperty("monto")
+    private Double monto;
 
-    @NotNull(message = "Transaction date is required")
-    private LocalDateTime transactionDate;
+    @JsonProperty("metodo_pago")
+    private String metodoPago;
 
-    @NotBlank(message = "Type is required")
-    private String type; // INCOME or EXPENSE
+    @JsonProperty("esencial")
+    private Boolean esencial;
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
-    public LocalDateTime getTransactionDate() { return transactionDate; }
-    public void setTransactionDate(LocalDateTime transactionDate) { this.transactionDate = transactionDate; }
+    @NotBlank(message = "La categoría principal es requerida")
+    @JsonProperty("categoria_principal")
+    private String categoriaPrincipal;
+
+    @NotNull(message = "La fecha es requerida")
+    @JsonProperty("fecha")
+    private LocalDateTime fecha;
+
+    @NotBlank(message = "El tipo es requerido (INCOME o EXPENSE)")
+    private String type;
+
+    public String getNombreTienda() { return nombreTienda; }
+    public void setNombreTienda(String nombreTienda) { this.nombreTienda = nombreTienda; }
+    public String getSubcategoria() { return subcategoria; }
+    public void setSubcategoria(String subcategoria) { this.subcategoria = subcategoria; }
+    public Double getMonto() { return monto; }
+    public void setMonto(Double monto) { this.monto = monto; }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
+    public Boolean getEsencial() { return esencial; }
+    public void setEsencial(Boolean esencial) { this.esencial = esencial; }
+    public String getCategoriaPrincipal() { return categoriaPrincipal; }
+    public void setCategoriaPrincipal(String categoriaPrincipal) { this.categoriaPrincipal = categoriaPrincipal; }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
 }

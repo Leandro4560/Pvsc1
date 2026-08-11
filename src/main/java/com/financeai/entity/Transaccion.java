@@ -14,24 +14,33 @@ public class Transaccion {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario user;
 
-    @Column(nullable = false)
-    private String description;
+    @Column(name = "nombre_comercio", nullable = false)
+    private String nombreTienda;
 
-    @Column(nullable = false)
-    private Double amount;
+    @Column(name = "monto", nullable = false)
+    private Double monto;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Categoria category;
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
+
+    @Column(name = "descripcion")
+    private String descripcion;
 
     @Column(nullable = false)
-    private Integer confidence; 
+    private Integer confidence;
 
-    @Column(nullable = false)
-    private LocalDateTime transactionDate;
+    @Column(name = "fecha", nullable = false)
+    private LocalDateTime fecha;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "metodo_pago")
+    private String metodoPago;
+
+    @Column(name = "esencial")
+    private Boolean esencial;
+
+    @Column(name = "creado_en", nullable = false)
+    private LocalDateTime creadoEn;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
@@ -42,7 +51,7 @@ public class Transaccion {
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+        creadoEn = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
 
@@ -55,22 +64,40 @@ public class Transaccion {
     public void setId(Long id) { this.id = id; }
     public Usuario getUser() { return user; }
     public void setUser(Usuario user) { this.user = user; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public Double getAmount() { return amount; }
-    public void setAmount(Double amount) { this.amount = amount; }
-    public Categoria getCategory() { return category; }
-    public void setCategory(Categoria category) { this.category = category; }
+    public String getNombreTienda() { return nombreTienda; }
+    public void setNombreTienda(String nombreTienda) { this.nombreTienda = nombreTienda; }
+    public Double getMonto() { return monto; }
+    public void setMonto(Double monto) { this.monto = monto; }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     public Integer getConfidence() { return confidence; }
     public void setConfidence(Integer confidence) { this.confidence = confidence; }
-    public LocalDateTime getTransactionDate() { return transactionDate; }
-    public void setTransactionDate(LocalDateTime transactionDate) { this.transactionDate = transactionDate; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getFecha() { return fecha; }
+    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
+    public Boolean getEsencial() { return esencial; }
+    public void setEsencial(Boolean esencial) { this.esencial = esencial; }
+    public LocalDateTime getCreadoEn() { return creadoEn; }
+    public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
     public TransactionType getType() { return type; }
     public void setType(TransactionType type) { this.type = type; }
+
+    // Aliases de compatibilidad para el servicio existente
+    public String getDescription() { return nombreTienda; }
+    public void setDescription(String description) { this.nombreTienda = description; }
+    public Double getAmount() { return monto; }
+    public void setAmount(Double amount) { this.monto = amount; }
+    public Categoria getCategory() { return categoria; }
+    public void setCategory(Categoria category) { this.categoria = category; }
+    public LocalDateTime getTransactionDate() { return fecha; }
+    public void setTransactionDate(LocalDateTime transactionDate) { this.fecha = transactionDate; }
+    public LocalDateTime getCreatedAt() { return creadoEn; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.creadoEn = createdAt; }
 
     public enum TransactionType {
         INCOME, EXPENSE

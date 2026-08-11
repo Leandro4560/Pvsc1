@@ -27,18 +27,14 @@ public class UserController {
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
                 return ResponseEntity.badRequest().body("La contraseña es requerida");
             }
-            if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
+            if (user.getNombre() == null || user.getNombre().isEmpty()) {
                 return ResponseEntity.badRequest().body("El nombre es requerido");
             }
-            if (user.getLastName() == null || user.getLastName().isEmpty()) {
-                return ResponseEntity.badRequest().body("El apellido es requerido");
-            }
-            
+
             Usuario created = userService.createUser(
                 user.getEmail(),
                 user.getPassword(),
-                user.getFirstName(),
-                user.getLastName()
+                user.getNombre()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
@@ -89,12 +85,12 @@ public class UserController {
     @PutMapping("/{userId}/financial")
     public ResponseEntity<Usuario> updateFinancialData(
             @PathVariable Long userId,
-            @RequestParam(required = false) Double income,
-            @RequestParam(required = false) Double expenses,
-            @RequestParam(required = false) Double emergencyFund,
-            @RequestParam(required = false) Double debt) {
+            @RequestParam(required = false) Double ingresoMensual,
+            @RequestParam(required = false) Double gastosMensuales,
+            @RequestParam(required = false) Double ahorroPrevio,
+            @RequestParam(required = false) Double cuotasMensualesDeuda) {
         try {
-            Usuario updated = userService.updateFinancialData(userId, income, expenses, emergencyFund, debt);
+            Usuario updated = userService.updateFinancialData(userId, ingresoMensual, gastosMensuales, ahorroPrevio, cuotasMensualesDeuda);
             if (updated == null) {
                 return ResponseEntity.notFound().build();
             }

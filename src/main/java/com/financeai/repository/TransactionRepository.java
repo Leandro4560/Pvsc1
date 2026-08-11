@@ -14,18 +14,23 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaccion, Long> {
     List<Transaccion> findByUser(Usuario usuario);
 
-    List<Transaccion> findByUserAndTransactionDateBetween(
+    List<Transaccion> findByUserAndFechaBetween(
             Usuario usuario,
             LocalDateTime startDate,
             LocalDateTime endDate
     );
 
-    List<Transaccion> findByUserOrderByTransactionDateDesc(Usuario usuario);
+    List<Transaccion> findByUserOrderByFechaDesc(Usuario usuario);
 
-    @Query("SELECT t FROM Transaccion t WHERE t.user = :usuario AND MONTH(t.transactionDate) = :month AND YEAR(t.transactionDate) = :year")
+    @Query("SELECT t FROM Transaccion t WHERE t.user = :usuario AND MONTH(t.fecha) = :month AND YEAR(t.fecha) = :year")
     List<Transaccion> findByUserAndMonth(
             @Param("usuario") Usuario usuario,
             @Param("month") Integer month,
             @Param("year") Integer year
     );
+
+    // Alias de compatibilidad
+    default List<Transaccion> findByUserOrderByTransactionDateDesc(Usuario usuario) {
+        return findByUserOrderByFechaDesc(usuario);
+    }
 }

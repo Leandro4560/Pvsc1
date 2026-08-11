@@ -24,16 +24,16 @@ public class TransactionController {
             @RequestParam Long userId,
             @RequestBody CreateTransactionDTO dto) {
         try {
-            if (dto.getDescription() == null || dto.getDescription().isEmpty()) {
-                return ResponseEntity.badRequest().body("La descripción es requerida");
+            if (dto.getNombreTienda() == null || dto.getNombreTienda().isEmpty()) {
+                return ResponseEntity.badRequest().body("El nombre de tienda es requerido");
             }
-            if (dto.getAmount() == null) {
+            if (dto.getMonto() == null) {
                 return ResponseEntity.badRequest().body("El monto es requerido");
             }
-            if (dto.getCategory() == null || dto.getCategory().isEmpty()) {
-                return ResponseEntity.badRequest().body("La categoría es requerida");
+            if (dto.getCategoriaPrincipal() == null || dto.getCategoriaPrincipal().isEmpty()) {
+                return ResponseEntity.badRequest().body("La categoría principal es requerida");
             }
-            if (dto.getTransactionDate() == null) {
+            if (dto.getFecha() == null) {
                 return ResponseEntity.badRequest().body("La fecha es requerida");
             }
             if (dto.getType() == null || dto.getType().isEmpty()) {

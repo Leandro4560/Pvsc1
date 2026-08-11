@@ -40,7 +40,7 @@ function DashboardPage() {
           <div className="dashboard-page__charts-row">
             <ExpensesByCategoryCard
               categories={dashboardData.expensesByCategory}
-              total={dashboardData.indicators.totalExpenses}
+              total={dashboardData.expensesByCategory.reduce((sum, cat) => sum + cat.amount, 0)}
             />
             <MonthlyEvolutionCard data={dashboardData.monthlyEvolution} />
           </div>
