@@ -9,6 +9,7 @@ import com.financeai.repository.TransactionRepository;
 import com.financeai.repository.AlertRepository;
 import com.financeai.service.DashboardService;
 import com.financeai.service.AlertService;
+import com.financeai.service.MlService;
 import com.financeai.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Autowired
     private TransactionService transactionService;
+
+    @Autowired
+    private MlService mlService;
 
     // Categorías consideradas esenciales
     private static final Set<String> CATEGORIAS_ESENCIALES = Set.of(
@@ -150,8 +154,14 @@ public class DashboardServiceImpl implements DashboardService {
         Double denominadorSupervivencia = gastosEsencialesMensuales + cuotasMensualesDeuda;
         Double mesesSupervivencia = denominadorSupervivencia > 0 ? ahorroTotal / denominadorSupervivencia : 0.0;
 
-        // perfil_financiero
-        String perfilFinanciero = calcularPerfilFinanciero(ratioEndeudamientoDti, mesesSupervivencia, ratioAhorroNeto);
+        // perfil_financiero — primero intentar con el modelo ML, si no, usar cálculo local
+        String perfilFinanciero = obtenerPerfilFinancieroML(
+            ingresoMensualFijo, ingresoMensualVariable, gastosEsencialesMensuales,
+            gastosNoEsencialesMensuales, cuotasMensualesDeuda, ahorroPrevio
+        );
+        if (perfilFinanciero == null) {
+            perfilFinanciero = calcularPerfilFinanciero(ratioEndeudamientoDti, mesesSupervivencia, ratioAhorroNeto);
+        }
 
         // Setear todos los campos
         metrics.setIngresoMensualFijo(ingresoMensualFijo);
@@ -174,6 +184,33 @@ public class DashboardServiceImpl implements DashboardService {
         metrics.setPerfilFinanciero(perfilFinanciero);
 
         return metrics;
+    }
+
+    /**
+     * Llama al microservicio Python de ML para obtener el perfil financiero predicho.
+     * Si el servicio no está disponible o falla, devuelve null para usar el cálculo local.
+     */
+    private String obtenerPerfilFinancieroML(
+            Double ingresoMensualFijo, Double ingresoMensualVariable,
+            Double gastosEsencialesMensuales, Double gastosNoEsencialesMensuales,
+            Double cuotasMensualesDeuda, Double ahorroPrevio) {
+        try {
+            Map<String, Object> datosFinancieros = new HashMap<>();
+            datosFinancieros.put("ingreso_mensual_fijo", ingresoMensualFijo);
+            datosFinancieros.put("ingreso_mensual_variable", ingresoMensualVariable);
+            datosFinancieros.put("gastos_esenciales_mensuales", gastosEsencialesMensuales);
+            datosFinancieros.put("gastos_no_esenciales_mensuales", gastosNoEsencialesMensuales);
+            datosFinancieros.put("cuotas_mensuales_deuda", cuotasMensualesDeuda);
+            datosFinancieros.put("ahorro_previo", ahorroPrevio);
+
+            Map<String, Object> resultado = mlService.calcularFinanzas(datosFinancieros);
+            if (resultado != null && resultado.containsKey("perfil_financiero")) {
+                return resultado.get("perfil_financiero").toString();
+            }
+        } catch (Exception e) {
+            System.err.println("[Dashboard] ML service no disponible, usando cálculo local: " + e.getMessage());
+        }
+        return null;
     }
 
     private String calcularPerfilFinanciero(Double ratioEndeudamientoDti, Double mesesSupervivencia, Double ratioAhorroNeto) {
