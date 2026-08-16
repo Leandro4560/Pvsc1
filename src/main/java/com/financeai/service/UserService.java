@@ -10,4 +10,5 @@ public interface UserService {
     Usuario updateUser(Long id, Usuario user);
     void deleteUser(Long id);
     Usuario updateFinancialData(Long userId, Double ingresoMensual, Double gastosMensuales, Double ahorroPrevio, Double cuotasMensualesDeuda);
+    boolean verifyPassword(String rawPassword, String encodedPassword);
 }

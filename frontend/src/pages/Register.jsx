@@ -1,7 +1,8 @@
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
+import { registerUser, saveSession } from "../api/auth";
 import "./Login.css";
 
 function Register() {
@@ -10,8 +11,10 @@ function Register() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
@@ -25,15 +28,27 @@ function Register() {
       return;
     }
 
-    // TODO: Conectar con la API de registro aquí.
-    // Ejemplo mínimo: fetch('/api/register', { method: 'POST', body: JSON.stringify({ name, email, password }) })...
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
 
-    // Por ahora sólo limpiar y mostrar confirmación básica
-    setName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setError("Registración exitosa (simulada). Podés iniciar sesión ahora.");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Ingresá un correo electrónico válido (ejemplo@correo.com).");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await registerUser(name, email, password);
+      saveSession(user);
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Error al crear la cuenta. Intentá de nuevo.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,6 +87,7 @@ function Register() {
               placeholder="Tu nombre"
               autoComplete="name"
               required
+              disabled={loading}
             />
           </div>
 
@@ -89,6 +105,7 @@ function Register() {
               placeholder="tu@email.com"
               autoComplete="email"
               required
+              disabled={loading}
             />
           </div>
 
@@ -106,6 +123,7 @@ function Register() {
               placeholder="••••••••"
               autoComplete="new-password"
               required
+              disabled={loading}
             />
           </div>
 
@@ -123,13 +141,18 @@ function Register() {
               placeholder="••••••••"
               autoComplete="new-password"
               required
+              disabled={loading}
             />
           </div>
 
-          {error && <p role="status" style={{ color: "var(--color-error)", margin: 0 }}>{error}</p>}
+          {error && (
+            <p role="alert" style={{ color: "var(--color-error)", margin: 0 }}>
+              {error}
+            </p>
+          )}
 
-          <Button type="submit" fullWidth>
-            Crear cuenta
+          <Button type="submit" fullWidth disabled={loading}>
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
         </form>
 

@@ -1,6 +1,7 @@
 import { env } from "./env";
 import { dashboardMock, type DashboardData } from "../features/dashboard/components/dashboardMocks";
 import type { FinancialStatus } from "../types/financial-analysis";
+import { authenticatedFetch } from "./auth";
 
 interface DashboardMetricsDTO {
   ingreso_mensual_fijo?: number;
@@ -204,12 +205,7 @@ export async function fetchDashboardData(userId = "1"): Promise<DashboardData> {
   console.info(`[Dashboard] Fetching: ${url}`);
 
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await authenticatedFetch(url);
 
     if (!response.ok) {
       const body = await response.text();

@@ -1,23 +1,44 @@
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/ui/Button";
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { loginUser, saveSession } from "../api/auth";
 import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
-     if ( !email || !password) {
-      setError("Credenciales incorrectas. Por favor, revisá tu email y contraseña.");
+
+    if (!email || !password) {
+      setError("Por favor completá todos los campos.");
       return;
     }
-  }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Ingresá un correo electrónico válido (ejemplo@correo.com).");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const user = await loginUser(email, password);
+      saveSession(user);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Credenciales incorrectas. Revisá tu email y contraseña.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="login-page">
       <div className="login-page__backdrop" aria-hidden="true" />
@@ -54,6 +75,7 @@ function Login() {
               placeholder="tu@email.com"
               autoComplete="email"
               required
+              disabled={loading}
             />
           </div>
 
@@ -71,15 +93,18 @@ function Login() {
               placeholder="••••••••"
               autoComplete="current-password"
               required
+              disabled={loading}
             />
           </div>
+
           {error && (
             <p className="login-form__error" role="alert" style={{ color: "var(--color-error)" }}>
               {error}
             </p>
           )}
-          <Button type="submit" fullWidth>
-            Iniciar Sesión
+
+          <Button type="submit" fullWidth disabled={loading}>
+            {loading ? "Ingresando..." : "Iniciar Sesión"}
           </Button>
         </form>
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import AlertsCard from "../features/dashboard/components/AlertsCard";
 import { dashboardMock, type DashboardData } from "../features/dashboard/components/dashboardMocks";
 import DashboardLayout from "../features/dashboard/components/DashboardLayout";
@@ -10,19 +11,27 @@ import ScoreCard from "../features/dashboard/components/ScoreCard";
 import StatsGrid from "../features/dashboard/components/StatsGrid";
 import TransactionsTable from "../features/dashboard/components/TransactionsTable";
 import { fetchDashboardData } from "../api/dashboard";
+import { getStoredUserId } from "../api/auth";
 import "./DashboardPage.css";
 
 function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<DashboardData>(dashboardMock);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const userId = getStoredUserId();
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
+
     async function loadDashboard() {
-      const data = await fetchDashboardData("1");
+      const data = await fetchDashboardData(userId!);
       setDashboardData(data);
     }
 
     loadDashboard();
-  }, []);
+  }, [navigate]);
 
   return (
     <DashboardLayout lastAnalysisDate={dashboardData.lastAnalysisDate} hasNotifications>
