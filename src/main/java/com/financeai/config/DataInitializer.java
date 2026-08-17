@@ -13,60 +13,24 @@ public class DataInitializer implements CommandLineRunner {
     private CategoryRepository categoryRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
+        // Solo crear si la tabla está vacía
         if (categoryRepository.count() == 0) {
-            createDefaultCategories();
+            crearCategoria("Alimentación", "#2CA02C", "utensils");
+            crearCategoria("Transporte", "#FF7F0E", "car");
+            crearCategoria("Salud", "#9467BD", "heart-pulse");
+            crearCategoria("Hogar", "#1F77B4", "home");
+            crearCategoria("Entretenimiento", "#8C564B", "gamepad");
+            crearCategoria("Finanzas", "#4CAF50", "dollar-sign");
+            System.out.println("[DataInitializer] Categorías creadas exitosamente.");
         }
     }
 
-    private void createDefaultCategories() {
-        Categoria housing = new Categoria();
-        housing.setName("Vivienda");
-        housing.setColor("#1F77B4");
-        housing.setPercentage(30);
-        housing.setIcon("🏠");
-        categoryRepository.save(housing);
-
-        Categoria food = new Categoria();
-        food.setName("Alimentación");
-        food.setColor("#2CA02C");
-        food.setPercentage(25);
-        food.setIcon("🍔");
-        categoryRepository.save(food);
-
-        Categoria transport = new Categoria();
-        transport.setName("Transporte");
-        transport.setColor("#FF7F0E");
-        transport.setPercentage(15);
-        transport.setIcon("🚗");
-        categoryRepository.save(transport);
-
-        Categoria services = new Categoria();
-        services.setName("Servicios");
-        services.setColor("#D62728");
-        services.setPercentage(10);
-        services.setIcon("⚙️");
-        categoryRepository.save(services);
-
-        Categoria health = new Categoria();
-        health.setName("Salud");
-        health.setColor("#9467BD");
-        health.setPercentage(8);
-        health.setIcon("⚕️");
-        categoryRepository.save(health);
-
-        Categoria entertainment = new Categoria();
-        entertainment.setName("Entretenimiento");
-        entertainment.setColor("#8C564B");
-        entertainment.setPercentage(10);
-        entertainment.setIcon("🎬");
-        categoryRepository.save(entertainment);
-
-        Categoria other = new Categoria();
-        other.setName("Otros");
-        other.setColor("#E377C2");
-        other.setPercentage(2);
-        other.setIcon("📦");
-        categoryRepository.save(other);
+    private void crearCategoria(String nombre, String color, String icon) {
+        Categoria cat = new Categoria();
+        cat.setName(nombre);
+        cat.setColor(color);
+        cat.setIcon(icon);
+        categoryRepository.save(cat);
     }
 }

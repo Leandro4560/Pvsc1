@@ -44,12 +44,12 @@ public class DashboardServiceImpl implements DashboardService {
 
     // Categorías consideradas esenciales
     private static final Set<String> CATEGORIAS_ESENCIALES = Set.of(
-        "Alimentación", "Vivienda", "Salud", "Transporte", "Servicios"
+        "Alimentación", "Hogar", "Salud", "Transporte"
     );
 
     // Categorías de ocio/entretenimiento
     private static final Set<String> CATEGORIAS_OCIO = Set.of(
-        "Entretenimiento", "Ocio"
+        "Entretenimiento"
     );
 
     @Override
